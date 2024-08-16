@@ -103,7 +103,7 @@ export default function Page() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center md:flex-row gap-8 md:pt-20 md:justify-center">
+    <div className=" flex flex-col items-center justify-center md:flex-row gap-8 md:pt-20 md:justify-center">
       <Toaster />
       <div className="flex flex-col items-center m-6 gap-2">
         <SingleImageDropzone
