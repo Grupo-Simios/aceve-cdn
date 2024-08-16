@@ -209,7 +209,10 @@ export default function Page() {
               {...register('url')} // Registro correto do campo
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 const { name, value } = event.target
-                setValue(name, value) // Atualiza o valor do campo
+                setValue(
+                  name as 'imgName' | 'imgType' | 'url' | 'author',
+                  value
+                )
                 trigger('url') // Dispara a validação manualmente
               }}
               defaultValue={fieldValues.url} // Use defaultValue para valores iniciais
