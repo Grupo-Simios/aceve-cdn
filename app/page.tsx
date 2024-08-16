@@ -103,7 +103,7 @@ export default function Page() {
   }
 
   return (
-    <div className="flex items-center justify-center h-screen gap-8">
+    <div className="flex flex-col items-center justify-center md:flex-row gap-8 md:pt-20 md:justify-center">
       <Toaster />
       <div className="flex flex-col items-center m-6 gap-2">
         <SingleImageDropzone
@@ -149,10 +149,10 @@ export default function Page() {
         </button>
       </div>
 
-      <div className="w-[30%]">
+      <div className="w-[80%] md:w-[30%] ">
         <form
           onSubmit={handleSubmit(onSubmitImg)}
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-2 items-start"
         >
           <fieldset className="flex flex-col gap-2">
             <label htmlFor="author" className="text-[12px]">
@@ -164,7 +164,7 @@ export default function Page() {
                 onChange: (event: React.ChangeEvent<HTMLSelectElement>) =>
                   handleinputValue(event)
               })}
-              className="bg-black text-white"
+              className="dark:bg-black text-white"
               value={fieldValues.author}
             >
               <option value="">Selecione</option>
@@ -183,7 +183,7 @@ export default function Page() {
             <input
               id="titulo"
               type="text"
-              className="bg-black ring-1 ring-slate-100 px-2 py-2 rounded-md"
+              className="bg-gray-200 dark:bg-black ring-1 ring-slate-100 px-2 py-2 rounded-md"
               placeholder="Titulo da imagem"
               {...register('imgName', {
                 onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
@@ -203,7 +203,7 @@ export default function Page() {
             <input
               id="url"
               type="text"
-              className="bg-black ring-1 ring-slate-100 px-2 py-2 rounded-md"
+              className="bg-gray-200 dark:bg-black ring-1 ring-slate-100 px-2 py-2 rounded-md"
               placeholder="Url da Imagem"
               {...register('url')} // Registro correto do campo
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -232,7 +232,7 @@ export default function Page() {
                 onChange: (event: React.ChangeEvent<HTMLSelectElement>) =>
                   handleinputValue(event)
               })}
-              className="bg-black text-white"
+              className="bg-gray-200 dark:bg-black text-white flex-1"
               value={fieldValues.imgType}
             >
               <option value="">Selecione</option>
