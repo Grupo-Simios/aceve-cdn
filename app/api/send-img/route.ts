@@ -1,12 +1,14 @@
 import dbConnect from '@/app/config/mongodb/mongoconnect'
 import { NewUploadSchema } from '@/app/model/uploadmodel'
+import { error } from 'console'
 
 export async function POST(req: Request) {
   try {
     await dbConnect()
     const { imgName, imgType, url, author } = await req.json()
+    console.log(author)
 
-    if (!imgName || !imgType || !url || !author) {
+    if (!url) {
       console.log('Dados Obrigatórios')
       return new Response(JSON.stringify({ msg: 'Falha ao Obter Dados' }), {
         status: 400
