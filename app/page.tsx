@@ -7,8 +7,7 @@ import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import axios from 'axios'
-import { File, Loader, SplineIcon } from 'lucide-react'
-import clsx from 'clsx'
+import { File } from 'lucide-react'
 import { toast, Toaster } from 'react-hot-toast'
 
 export default function Page() {
