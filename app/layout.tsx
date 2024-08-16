@@ -6,8 +6,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Upload files',
-  description: '🗃️ Upload files to the EdgeStore'
+  title: 'Cdn de Imagens',
+  description: '🗃️ CDN TDD - Ong Violeta Eliz'
 }
 
 export default function RootLayout({
@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="pt" className="bg-black">
       <body className={inter.className}>
         <EdgeStoreProvider>{children}</EdgeStoreProvider>
       </body>
