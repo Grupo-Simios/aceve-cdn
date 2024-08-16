@@ -4,13 +4,18 @@ import { SingleImageDropzone } from '@/components/singleImageDropzone'
 import { useEdgeStore } from '@/lib/edgestore'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import * as yup from 'yup'
-
-import { z } from 'zod'
 import { yupResolver } from '@hookform/resolvers/yup'
+import axios from 'axios'
+import { File, Loader, SplineIcon } from 'lucide-react'
+import clsx from 'clsx'
+import { toast, Toaster } from 'react-hot-toast'
 
 export default function Page() {
+  const [isloading, setisloading] = useState<boolean | null>(null)
+  const [ErrorUpload, setErrorUpload] = useState<Error | null>(null)
+  const [sucess, setsucess] = useState<boolean | null>(null)
+
   const [file, setFile] = useState<File>()
   const [progress, setProgress] = useState(0)
   const [urls, setUrls] = useState<{
@@ -19,17 +24,24 @@ export default function Page() {
   }>()
   const { edgestore } = useEdgeStore()
 
+  const [fieldValues, setFieldValues] = useState({
+    imgName: '',
+    imgType: '',
+    url: '',
+    author: ''
+  })
+
   const schemaUpload = yup.object().shape({
     imgName: yup.string().required('Campo Obrigatório'),
     imgType: yup
       .string()
       .oneOf(
-        ['padrão', 'logo', 'postagem', 'miniatura', 'icon'],
+        ['padrão', 'logo', 'postagem', 'miniatura', 'icon', 'fundo'],
         'Escolha um Tipo Adequado'
       )
       .required('Campo Obrigatório'),
     url: yup.string().url('URL inválida'),
-    author: yup.string().oneOf(['dinho', 'davi']).required('Campo Obrigatório')
+    author: yup.string().required('Campo Obrigatório')
   })
 
   const {
@@ -37,21 +49,49 @@ export default function Page() {
     register,
     setValue,
     trigger,
+    reset,
     formState: { errors }
   } = useForm({
     resolver: yupResolver(schemaUpload)
   })
 
-  const onSubmitImg = (data: any) => {
-    console.log(data)
-  }
+  const onSubmitImg = async (data: any) => {
+    setisloading(true)
 
-  const [fieldValues, setFieldValues] = useState({
-    imgName: '',
-    imgType: '',
-    url: '',
-    author: ''
-  })
+    try {
+      console.log(data)
+
+      // Use toast.promise com a chamada da promessa
+      const response = await toast.promise(
+        axios.post('/api/send-img', {
+          imgName: data.imgName,
+          imgType: data.imgType,
+          url: data.url,
+          author: data.author
+        }),
+        {
+          loading: 'Carregando....',
+          success: ' Cadastrada com Sucesso',
+          error: ' Erro Desconhecido'
+        }
+      )
+
+      if (response) {
+        setisloading(false)
+        reset()
+        setFieldValues(prevState => ({
+          ...prevState,
+          imgName: '',
+          imgType: '',
+          url: '',
+          author: ''
+        }))
+      }
+    } catch (error) {
+      console.error('Error when fetching:', error)
+      setisloading(false)
+    }
+  }
 
   const handleinputValue = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -65,6 +105,7 @@ export default function Page() {
 
   return (
     <div className="flex items-center justify-center h-screen gap-8">
+      <Toaster />
       <div className="flex flex-col items-center m-6 gap-2">
         <SingleImageDropzone
           width={256}
@@ -100,11 +141,7 @@ export default function Page() {
                 ...prevState,
                 url: res.url
               })),
-                setFieldValues(prevState => ({
-                  ...prevState,
-                  url: res.url // Atualize o campo no estado
-                }))
-              setValue('url', res.url) // Atualize o campo no react-hook-form
+                setValue('url', res.url) // Atualize o campo no react-hook-form
               trigger('url') // Dispara a validação manualmente
             }
           }}
@@ -211,9 +248,10 @@ export default function Page() {
 
           <button
             type="submit"
-            className="bg-green-700 text-white rounded-lg py-2 px-2 my-6"
+            className="bg-green-700 text-white rounded-lg py-2 px-2 my-6 flex items-center gap-2 justify-center"
           >
-            Cadastrar
+            <File />
+            Cadastrar{' '}
           </button>
         </form>
       </div>
