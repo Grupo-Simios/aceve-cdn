@@ -2,12 +2,13 @@
 
 import { SingleImageDropzone } from '@/components/singleImageDropzone'
 import { useEdgeStore } from '@/lib/edgestore'
-import { Files } from 'lucide-react'
 import { useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import * as yup from 'yup'
 
 import { z } from 'zod'
+import { yupResolver } from '@hookform/resolvers/yup'
 
 export default function Page() {
   const [file, setFile] = useState<File>()
@@ -18,26 +19,39 @@ export default function Page() {
   }>()
   const { edgestore } = useEdgeStore()
 
-  const schemaUpload = z.object({
-    name: z.string().min(1, 'Campo Obrigatório'),
-    imgType: z.enum(['padrão', 'logo', 'postagem', 'miniatura', 'icon']),
-    url: z.string().url('URL inválida'),
-    author: z.enum(['dinho', 'davi'])
+  const schemaUpload = yup.object().shape({
+    imgName: yup.string().required('Campo Obrigatório'),
+    imgType: yup
+      .string()
+      .oneOf(
+        ['padrão', 'logo', 'postagem', 'miniatura', 'icon'],
+        'Escolha um Tipo Adequado'
+      )
+      .required('Campo Obrigatório'),
+    url: yup.string().url('URL inválida'),
+    author: yup.string().oneOf(['dinho', 'davi']).required('Campo Obrigatório')
   })
 
   const {
     handleSubmit,
-    control,
+    register,
+    setValue,
+    trigger,
     formState: { errors }
   } = useForm({
-    resolver: zodResolver(schemaUpload)
+    resolver: yupResolver(schemaUpload)
   })
 
   const onSubmitImg = (data: any) => {
     console.log(data)
   }
 
-  const [fieldValues, setFieldValues] = useState({})
+  const [fieldValues, setFieldValues] = useState({
+    imgName: '',
+    imgType: '',
+    url: '',
+    author: ''
+  })
 
   const handleinputValue = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -48,7 +62,6 @@ export default function Page() {
       [name]: value
     }))
   }
-  console.log(fieldValues)
 
   return (
     <div className="flex items-center justify-center h-screen gap-8">
@@ -83,10 +96,16 @@ export default function Page() {
                   setProgress(progress)
                 }
               })
-              setUrls({
-                url: res.url,
-                thumbnailUrl: res.thumbnailUrl
-              })
+              setFieldValues(prevState => ({
+                ...prevState,
+                url: res.url
+              })),
+                setFieldValues(prevState => ({
+                  ...prevState,
+                  url: res.url // Atualize o campo no estado
+                }))
+              setValue('url', res.url) // Atualize o campo no react-hook-form
+              trigger('url') // Dispara a validação manualmente
             }
           }}
         >
@@ -103,25 +122,19 @@ export default function Page() {
             <label htmlFor="author" className="text-[12px]">
               Administrador
             </label>
-            <Controller
-              name="author"
-              control={control}
-              render={({ field }) => (
-                <select
-                  id="author"
-                  {...field}
-                  className="bg-black text-white"
-                  value={urls?.url}
-                  onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
-                    handleinputValue(event)
-                  }
-                >
-                  <option value="">Selecione</option>
-                  <option value="Dinho">Dinho</option>
-                  <option value="Davi">Davi</option>
-                </select>
-              )}
-            />
+            <select
+              id="author"
+              {...register('author', {
+                onChange: (event: React.ChangeEvent<HTMLSelectElement>) =>
+                  handleinputValue(event)
+              })}
+              className="bg-black text-white"
+              value={fieldValues.author}
+            >
+              <option value="">Selecione</option>
+              <option value="dinho">dinho</option>
+              <option value="davi">davi</option>
+            </select>
             {errors.author && (
               <span className="text-red-500">{errors.author.message}</span>
             )}
@@ -130,45 +143,41 @@ export default function Page() {
           <fieldset className="flex flex-col gap-2">
             <label htmlFor="titulo" className="text-[12px]">
               Titulo da Imagem
-      
-                <input
-                  id="titulo"
-                  type="text"
-                  value={setFieldValues.imgName}
-                  className="bg-black ring-1 ring-slate-100 px-2 py-2 rounded-md"
-                  placeholder="Titulo da imagem"
-                  {...register("titulo")}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                    handleinputValue(event)
-                  }
-                />
-         
+            </label>
+            <input
+              id="titulo"
+              type="text"
+              className="bg-black ring-1 ring-slate-100 px-2 py-2 rounded-md"
+              placeholder="Titulo da imagem"
+              {...register('imgName', {
+                onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
+                  handleinputValue(event)
+              })}
+              value={fieldValues.imgName}
+            />
             {errors.imgName && (
               <span className="text-red-500">{errors.imgName.message}</span>
             )}
           </fieldset>
 
           <fieldset className="flex flex-col gap-2">
-            <label htmlFor="urlimg" className="text-[12px]">
+            <label htmlFor="url" className="text-[12px]">
               Url da Imagem
             </label>
-            <Controller
-              name="url"
-              control={control}
-              render={({ field }) => (
-                <input
-                  id="urlimg"
-                  type="text"
-                  className="bg-black ring-1 ring-slate-100 px-2 py-2 rounded-md"
-                  placeholder="Url da Imagem"
-                  value={urls?.url} // Valor controlado externamente
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    field.onChange(event.target.value) // Atualiza o valor no react-hook-form
-                    handleinputValue(event) // Controla o valor manualmente
-                  }}
-                />
-              )}
+            <input
+              id="url"
+              type="text"
+              className="bg-black ring-1 ring-slate-100 px-2 py-2 rounded-md"
+              placeholder="Url da Imagem"
+              {...register('url')} // Registro correto do campo
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                const { name, value } = event.target
+                setValue(name, value) // Atualiza o valor do campo
+                trigger('url') // Dispara a validação manualmente
+              }}
+              defaultValue={fieldValues.url} // Use defaultValue para valores iniciais
             />
+
             {errors.url && (
               <span className="text-red-500">{errors.url.message}</span>
             )}
@@ -178,32 +187,23 @@ export default function Page() {
             <label htmlFor="imgtype" className="text-[12px]">
               Tipo
             </label>
-
-            <Controller
-              name="imgType"
-              control={control}
-              value={setFieldValues.imgType}
-              render={({ field }) => (
-                <select
-                  id="imgtype"
-                  {...field}
-                  className="bg-black text-white"
-                  value={setFieldValues.imgType}
-                  onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
-                    handleinputValue(event)
-                  }
-                >
-                  <option value="">Selecione</option>
-                  <option value="padrão">Padrão</option>
-                  <option value="logo">Logo</option>
-                  <option value="postagem">Postagem</option>
-                  <option value="miniatura">Miniatura</option>
-                  <option value="icon">Icon</option>
-                  <option value="fundo">Fundo</option>
-                </select>
-              )}
-            />
-
+            <select
+              id="imgtype"
+              {...register('imgType', {
+                onChange: (event: React.ChangeEvent<HTMLSelectElement>) =>
+                  handleinputValue(event)
+              })}
+              className="bg-black text-white"
+              value={fieldValues.imgType}
+            >
+              <option value="">Selecione</option>
+              <option value="padrão">Padrão</option>
+              <option value="logo">Logo</option>
+              <option value="postagem">Postagem</option>
+              <option value="miniatura">Miniatura</option>
+              <option value="icon">Icon</option>
+              <option value="fundo">Fundo</option>
+            </select>
             {errors.imgType && (
               <span className="text-red-500">{errors.imgType.message}</span>
             )}
