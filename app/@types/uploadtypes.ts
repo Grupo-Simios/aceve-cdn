@@ -2,9 +2,9 @@ import type { Document } from 'mongoose'
 
 export interface IupLoadImg extends Document {
   imgName?: string
-  imgType?: 'padrão' | 'logo' | 'postagem' | 'miniatura' | 'icon' | 'fundo'
+  imgType?: String
   url: string
-  author: string
+  author?: string
   createdAt?: Date
   updatedAt?: Date
 }
