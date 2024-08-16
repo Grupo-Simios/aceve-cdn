@@ -14,13 +14,19 @@
   "dependencies": {
     "@edgestore/react": "^0.1.4",
     "@edgestore/server": "^0.1.4",
-    "lucide-react": "^0.292.0",
+    "@hookform/resolvers": "^3.9.0",
+    "axios": "^1.7.4",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.427.0",
+    "mongoose": "^8.5.3",
     "next": "14.0.1",
     "react": "^18",
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",
+    "react-hook-form": "^7.52.2",
     "tailwind-merge": "^2.0.0",
-    "zod": "^3.22.4"
+    "yup": "^1.4.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20",
