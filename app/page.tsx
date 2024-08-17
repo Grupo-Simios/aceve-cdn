@@ -103,160 +103,162 @@ export default function Page() {
   }
 
   return (
-    <div className=" flex flex-col items-center justify-center md:flex-row gap-8 md:pt-20 md:justify-center">
-      <Toaster />
-      <div className="flex flex-col items-center m-6 gap-2">
-        <SingleImageDropzone
-          width={256}
-          height={256}
-          value={file}
-          dropzoneOptions={{
-            maxSize: 1024 * 1024 * 1 // 1MB
-          }}
-          onChange={file => {
-            setFile(file)
-          }}
-        />
-        <div className="h-[6px] w-64 border rounded overflow-hidden">
-          <div
-            className="h-full bg-white transition-all duration-150"
-            style={{
-              width: `${progress}%`
+    <>
+      <div className=" flex flex-col items-center justify-center md:flex-row gap-8 md:pt-20 md:justify-center">
+        <Toaster />
+        <div className="flex flex-col items-center m-6 gap-2">
+          <SingleImageDropzone
+            width={256}
+            height={256}
+            value={file}
+            dropzoneOptions={{
+              maxSize: 1024 * 1024 * 1 // 1MB
+            }}
+            onChange={file => {
+              setFile(file)
             }}
           />
-        </div>
-        <button
-          className="bg-white text-black rounded px-2 hover:opacity-80"
-          onClick={async () => {
-            if (file) {
-              const res = await edgestore.publicImages.upload({
-                file,
-                input: { type: 'post' },
-                onProgressChange: progress => {
-                  setProgress(progress)
-                }
-              })
-              setFieldValues(prevState => ({
-                ...prevState,
-                url: res.url
-              })),
-                setValue('url', res.url) // Atualize o campo no react-hook-form
-              trigger('url') // Dispara a validação manualmente
-            }
-          }}
-        >
-          Upload
-        </button>
-      </div>
-
-      <div className="w-[80%] md:w-[30%] ">
-        <form
-          onSubmit={handleSubmit(onSubmitImg)}
-          className="flex flex-col gap-2 items-start"
-        >
-          <fieldset className="flex flex-col gap-2">
-            <label htmlFor="author" className="text-[12px]">
-              Administrador
-            </label>
-            <select
-              id="author"
-              {...register('author', {
-                onChange: (event: React.ChangeEvent<HTMLSelectElement>) =>
-                  handleinputValue(event)
-              })}
-              className="dark:bg-black text-white"
-              value={fieldValues.author}
-            >
-              <option value="">Selecione</option>
-              <option value="dinho">dinho</option>
-              <option value="davi">davi</option>
-            </select>
-            {errors.author && (
-              <span className="text-red-500">{errors.author.message}</span>
-            )}
-          </fieldset>
-
-          <fieldset className="flex flex-col gap-2">
-            <label htmlFor="titulo" className="text-[12px]">
-              Titulo da Imagem
-            </label>
-            <input
-              id="titulo"
-              type="text"
-              className="bg-gray-200 dark:bg-black ring-1 ring-slate-100 px-2 py-2 rounded-md"
-              placeholder="Titulo da imagem"
-              {...register('imgName', {
-                onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
-                  handleinputValue(event)
-              })}
-              value={fieldValues.imgName}
-            />
-            {errors.imgName && (
-              <span className="text-red-500">{errors.imgName.message}</span>
-            )}
-          </fieldset>
-
-          <fieldset className="flex flex-col gap-2">
-            <label htmlFor="url" className="text-[12px]">
-              Url da Imagem
-            </label>
-            <input
-              id="url"
-              type="text"
-              className="bg-gray-200 dark:bg-black ring-1 ring-slate-100 px-2 py-2 rounded-md"
-              placeholder="Url da Imagem"
-              {...register('url')} // Registro correto do campo
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                const { name, value } = event.target
-                setValue(
-                  name as 'imgName' | 'imgType' | 'url' | 'author',
-                  value
-                )
-                trigger('url') // Dispara a validação manualmente
+          <div className="h-[6px] w-64 border rounded overflow-hidden">
+            <div
+              className="h-full bg-white transition-all duration-150"
+              style={{
+                width: `${progress}%`
               }}
-              defaultValue={fieldValues.url} // Use defaultValue para valores iniciais
             />
-
-            {errors.url && (
-              <span className="text-red-500">{errors.url.message}</span>
-            )}
-          </fieldset>
-
-          <fieldset className="flex flex-col gap-2">
-            <label htmlFor="imgtype" className="text-[12px]">
-              Tipo
-            </label>
-            <select
-              id="imgtype"
-              {...register('imgType', {
-                onChange: (event: React.ChangeEvent<HTMLSelectElement>) =>
-                  handleinputValue(event)
-              })}
-              className="bg-gray-200 dark:bg-black text-white flex-1"
-              value={fieldValues.imgType}
-            >
-              <option value="">Selecione</option>
-              <option value="padrão">Padrão</option>
-              <option value="logo">Logo</option>
-              <option value="postagem">Postagem</option>
-              <option value="miniatura">Miniatura</option>
-              <option value="icon">Icon</option>
-              <option value="fundo">Fundo</option>
-            </select>
-            {errors.imgType && (
-              <span className="text-red-500">{errors.imgType.message}</span>
-            )}
-          </fieldset>
-
+          </div>
           <button
-            type="submit"
-            className="bg-green-700 text-white rounded-lg py-2 px-2 my-6 flex items-center gap-2 justify-center"
+            className="bg-white text-black rounded px-2 hover:opacity-80"
+            onClick={async () => {
+              if (file) {
+                const res = await edgestore.publicImages.upload({
+                  file,
+                  input: { type: 'post' },
+                  onProgressChange: progress => {
+                    setProgress(progress)
+                  }
+                })
+                setFieldValues(prevState => ({
+                  ...prevState,
+                  url: res.url
+                })),
+                  setValue('url', res.url) // Atualize o campo no react-hook-form
+                trigger('url') // Dispara a validação manualmente
+              }
+            }}
           >
-            <File />
-            Cadastrar{' '}
+            Upload
           </button>
-        </form>
+        </div>
+
+        <div className="w-[80%] md:w-[30%] ">
+          <form
+            onSubmit={handleSubmit(onSubmitImg)}
+            className="flex flex-col gap-2 items-start"
+          >
+            <fieldset className="flex flex-col gap-2">
+              <label htmlFor="author" className="text-[12px]">
+                Administrador
+              </label>
+              <select
+                id="author"
+                {...register('author', {
+                  onChange: (event: React.ChangeEvent<HTMLSelectElement>) =>
+                    handleinputValue(event)
+                })}
+                className="dark:bg-black text-white"
+                value={fieldValues.author}
+              >
+                <option value="">Selecione</option>
+                <option value="dinho">dinho</option>
+                <option value="davi">davi</option>
+              </select>
+              {errors.author && (
+                <span className="text-red-500">{errors.author.message}</span>
+              )}
+            </fieldset>
+
+            <fieldset className="flex flex-col gap-2">
+              <label htmlFor="titulo" className="text-[12px]">
+                Titulo da Imagem
+              </label>
+              <input
+                id="titulo"
+                type="text"
+                className="bg-gray-200 dark:bg-black ring-1 ring-slate-100 px-2 py-2 rounded-md text-white"
+                placeholder="Titulo da imagem"
+                {...register('imgName', {
+                  onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
+                    handleinputValue(event)
+                })}
+                value={fieldValues.imgName}
+              />
+              {errors.imgName && (
+                <span className="text-red-500">{errors.imgName.message}</span>
+              )}
+            </fieldset>
+
+            <fieldset className="flex flex-col gap-2">
+              <label htmlFor="url" className="text-[12px]">
+                Url da Imagem
+              </label>
+              <input
+                id="url"
+                type="text"
+                className="bg-gray-200 dark:bg-black ring-1 ring-slate-100 px-2 py-2 rounded-md text-white"
+                placeholder="Url da Imagem"
+                {...register('url')} // Registro correto do campo
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  const { name, value } = event.target
+                  setValue(
+                    name as 'imgName' | 'imgType' | 'url' | 'author',
+                    value
+                  )
+                  trigger('url') // Dispara a validação manualmente
+                }}
+                defaultValue={fieldValues.url} // Use defaultValue para valores iniciais
+              />
+
+              {errors.url && (
+                <span className="text-red-500">{errors.url.message}</span>
+              )}
+            </fieldset>
+
+            <fieldset className="flex flex-col gap-2">
+              <label htmlFor="imgtype" className="text-[12px]">
+                Tipo
+              </label>
+              <select
+                id="imgtype"
+                {...register('imgType', {
+                  onChange: (event: React.ChangeEvent<HTMLSelectElement>) =>
+                    handleinputValue(event)
+                })}
+                className="bg-gray-200 dark:bg-black text-white flex-1"
+                value={fieldValues.imgType}
+              >
+                <option value="">Selecione</option>
+                <option value="padrão">Padrão</option>
+                <option value="logo">Logo</option>
+                <option value="postagem">Postagem</option>
+                <option value="miniatura">Miniatura</option>
+                <option value="icon">Icon</option>
+                <option value="fundo">Fundo</option>
+              </select>
+              {errors.imgType && (
+                <span className="text-red-500">{errors.imgType.message}</span>
+              )}
+            </fieldset>
+
+            <button
+              type="submit"
+              className="bg-green-700 text-white rounded-lg py-2 px-2 my-6 flex items-center gap-2 justify-center"
+            >
+              <File />
+              Cadastrar{' '}
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
