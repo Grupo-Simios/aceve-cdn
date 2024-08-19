@@ -12,7 +12,7 @@ export default function ImagemCollections() {
       try {
         const response = await axios.get('/api/get-imgs/')
 
-        if (response.status >= 200 && response.status < 300) {
+        if ((response.status = 200)) {
           console.log(response.data.getallimgs)
           setData(response.data.getallimgs)
           setIsError(false)
